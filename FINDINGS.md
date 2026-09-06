@@ -28,9 +28,12 @@ what turned up anyway.
 
 ---
 
+> **Status.** The four one-line items (1, 6, 7, 8) are fixed and verified.
+> Everything else below still stands.
+
 ## Defects
 
-### 1. No `<meta charset="utf-8">` — every glyph breaks off Netlify
+### 1. No `<meta charset="utf-8">` — every glyph breaks off Netlify — FIXED
 
 The file declares no encoding, so it depends entirely on the host sending one.
 Served without a `charset` in the `Content-Type` header, Chromium falls back to
@@ -39,13 +42,22 @@ bar renders `â—† 0  â—‡ 0  âœ¦ 0`, every `·` becomes `Â·`, every
 
 Netlify does send `charset=UTF-8`, which is why this has never been visible. It
 appears the moment the file is opened from disk, moved to another host, or
-served by anything simpler. One line in `<head>` fixes it permanently.
+served by anything simpler.
 
-### 2. No `<!doctype html>` — the game runs in quirks mode
+Fixed by `<meta charset="utf-8">` as line 2. Re-checked against a server that
+sends no charset at all: `document.characterSet` is now UTF-8 and the padlocks,
+diamonds and middots render.
 
-`document.compatMode` is `BackCompat`. The layout happens to survive at 430 × 932,
-but every box-model and table rule is on the legacy path, and that is a landmine
-under the file-splitting work in priority 3. Also one line.
+### 2. No `<!doctype html>` — the game runs in quirks mode — FIXED
+
+`document.compatMode` was `BackCompat`. The layout happened to survive at
+430 × 932, but every box-model rule was on the legacy path, and that is a
+landmine under the file-splitting work in priority 3.
+
+Fixed by `<!doctype html>` as line 1. Standards mode changes nothing measurable
+at 430 × 932: `#app` is still 390 × 845 at `scale(1.10256)`, top 1px, occupying
+430 × 931.7, tab bar at y 881.9, Descend button at y 200.6 — identical numbers
+before and after.
 
 ### 3. Every generic warden is drawn as the Void Spire boss
 
@@ -80,7 +92,7 @@ cheapest bonus in the system — is on the order of a thousand boss-stage clears
 Three full six-piece sets, all their bonuses and all their hand-drawn icons are
 currently decoration.
 
-### 6. The clear screen understates the reward
+### 6. The clear screen understates the reward — FIXED
 
 | | granted | printed |
 |---|---|---|
@@ -94,21 +106,31 @@ Line 3751 grants `B.gold + stage*44` and `8 + stage*1.8`; line 3762 prints
 screen admits, which is the harmless direction, but it makes the reward feel
 worse than it is at exactly the moment you are deciding whether to keep going.
 
-### 7. "Next stage" vanishes from stage 50 onward
+Fixed by printing the same expression the grant uses. Verified across stages 1,
+10, 49, 50, 52, 69 and 70, and in a real clear: granted 1,879 gold and 10
+soulfire, screen reads "+1879 gold · +10 soulfire".
+
+### 7. "Next stage" vanishes from stage 50 onward — FIXED
 
 Line 3764: `$("endNext").style.display = B.stage < 50 ? "" : "none"`. `STAGES` is
 70. Clear stage 50 through 69 and the end screen offers only "Camp" — the two
-BRUTAL chapters have to be re-entered by hand from the campaign list every time.
-Verified at stages 52 and 69.
+BRUTAL chapters had to be re-entered by hand from the campaign list every time.
 
-### 8. The Runes empty state describes something that doesn't happen
+Fixed by testing against `STAGES` rather than the literal 50. The button now
+carries through to stage 69 and hides only on 70, which is genuinely the last.
+
+### 8. The Runes empty state describes something that doesn't happen — FIXED
 
 > "No runes yet. Bosses drop them — clear the fifth room of any stage."
 
 Room 5 is the sanctuary, which has no boss. Runes are only rolled in `finish()`,
 after all fifty rooms: 35% on a normal stage, 90% on a boss stage. A new player
-following that sentence will clear five rooms, find no rune, and conclude the
-system is broken.
+following that sentence would clear five rooms, find no rune, and conclude the
+system was broken.
+
+Now reads: "No runes yet. Clear a whole stage to find one. Every tenth stage
+almost always drops one."
+
 
 ---
 
@@ -178,14 +200,12 @@ attempt ended.
 
 ---
 
-## Suggested order
+## What is left
 
-1. `<meta charset>` and `<!doctype>` — two lines, removes a whole class of
-   future confusion.
-2. The warden sprite fallback (#3) — every stage has four of them.
-3. The reward text and the "Next stage" gate (#6, #7) — both one-line.
-4. The rune empty-state copy (#8).
-5. Set-piece rarity (#5) and the Grimoire's drop pool (#4) — these decide whether
+1. The warden sprite fallback (#3) — every stage has four of them, and it needs a
+   generic warden drawing rather than a one-line change.
+2. Set-piece rarity (#5) and the Grimoire's drop pool (#4) — these decide whether
    a third of the item art ever gets seen.
-6. The two curves (#9, #10) and the stage-51 step (#11), which is really the
+3. The two curves (#9, #10) and the stage-51 step (#11), which is really the
    balance-simulation work already on the roadmap.
+4. The fifty-room stage length (#12), which is a design call rather than a bug.

@@ -1,3 +1,5 @@
+<!doctype html>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1713,7 +1715,7 @@ function renderRunes(){
     bag.appendChild(el);
   });
   $("runeEmpty").textContent=S.runes.length?"":
-    "No runes yet. Bosses drop them — clear the fifth room of any stage.";
+    "No runes yet. Clear a whole stage to find one. Every tenth stage almost always drops one.";
 }
 let runePickSlot=null;
 function openRune(rn,slot){
@@ -3759,9 +3761,9 @@ function finish(won){
     $("endSub").textContent="★".repeat(stars)+"☆".repeat(3-stars)+
       "  ·  "+B.kills+" slain"+(B.eliteKills?"  ·  "+B.eliteKills+" elite":"")+
       "  ·  "+Math.round(hpFrac*100)+"% health left";
-    $("endLoot").textContent="+"+fmt(B.gold+B.stage*30)+" gold  ·  +"+
-      Math.round(6+B.stage*1.4)+" soulfire"+(B.stage%10===0?"  ·  +20 gems":"");
-    $("endNext").style.display=B.stage<50?"":"none";
+    $("endLoot").textContent="+"+fmt(B.gold+B.stage*44)+" gold  ·  +"+
+      Math.round(8+B.stage*1.8)+" soulfire"+(B.stage%10===0?"  ·  +20 gems":"");
+    $("endNext").style.display=B.stage<STAGES?"":"none";
     $("endNext").textContent="Stage "+(B.stage+1);
   }else{
     S.gold+=Math.round(B.gold*.5);S.soul+=Math.round(B.stage*.5);
